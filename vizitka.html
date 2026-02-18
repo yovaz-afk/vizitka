@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Николай Мальцев — ФерМама</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Animated aurora orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle at 40% 40%, rgba(183,28,28,0.22) 0%, transparent 65%);
+      top: -18%; left: -18%;
+      filter: blur(72px);
+      animation: driftA 22s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle at 60% 40%, rgba(230,100,20,0.14) 0%, transparent 65%);
+      top: -10%; right: -18%;
+      filter: blur(80px);
+      animation: driftB 28s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 480px; height: 480px;
+      background: radial-gradient(circle at 50% 60%, rgba(140,10,10,0.18) 0%, transparent 65%);
+      bottom: -18%; left: 15%;
+      filter: blur(90px);
+      animation: driftC 20s ease-in-out infinite alternate;
+    }
+    .orb-4 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,180,0,0.07) 0%, transparent 70%);
+      bottom: 10%; right: 5%;
+      filter: blur(60px);
+      animation: driftD 16s ease-in-out infinite alternate;
+    }
+    @keyframes driftA {
+      from { transform: translate(0,   0)   scale(1);    }
+      to   { transform: translate(90px, 70px) scale(1.18); }
+    }
+    @keyframes driftB {
+      from { transform: translate(0,    0)    scale(1);   }
+      to   { transform: translate(-70px, 90px) scale(0.88); }
+    }
+    @keyframes driftC {
+      from { transform: translate(0,   0)    scale(1);   }
+      to   { transform: translate(50px, -80px) scale(1.12); }
+    }
+    @keyframes driftD {
+      from { transform: translate(0, 0)     scale(1); }
+      to   { transform: translate(-40px, -50px) scale(1.2); }
+    }
+
+    /* ── Noise grain ── */
+    .noise {
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.032;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Floating particles ── */
+    .particles {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,90,50,0.75), transparent 70%);
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(108vh) scale(0);  opacity: 0; }
+      7%   { opacity: 1; }
+      88%  { opacity: 0.3; }
+      100% { transform: translateY(-8vh)  scale(1);  opacity: 0; }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      max-width: 460px;
+      width: 93%;
+      padding: 48px 44px 44px;
+      text-align: center;
+      border-radius: 32px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.5),
+        0 32px 90px rgba(0,0,0,0.65),
+        0 0 100px rgba(180,20,20,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.09);
+      animation: cardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.94); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    /* Gradient border highlight */
+    .card::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 32px;
+      padding: 1px;
+      background: linear-gradient(155deg,
+        rgba(255,255,255,0.14) 0%,
+        rgba(255,255,255,0.03) 35%,
+        rgba(229,57,53,0.18)  100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Photo ring ── */
+    .photo-wrap {
+      position: relative;
+      width: 130px; height: 130px;
+      margin: 0 auto 26px;
+      animation: fadeUp 0.7s ease both 0.08s;
+    }
+
+    /* Rotating gradient ring */
+    .photo-ring {
+      position: absolute; inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #b71c1c, #e53935, #ff7043, #ffb300,
+        #ff7043, #e53935, #b71c1c
+      );
+      animation: ringSpin 4s linear infinite;
+      z-index: 0;
+    }
+    @keyframes ringSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Glow under ring */
+    .photo-glow {
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(183,28,28,0.5), rgba(255,112,0,0.3), rgba(255,179,0,0.3),
+        rgba(255,112,0,0.3), rgba(183,28,28,0.5)
+      );
+      filter: blur(10px);
+      animation: ringSpin 4s linear infinite;
+      z-index: 0;
+    }
+
+    /* Gap between ring and photo */
+    .photo-gap {
+      position: absolute; inset: 3px;
+      border-radius: 50%;
+      background: #0f0f0f;
+      z-index: 1;
+    }
+
+    /* Actual photo */
+    .photo-img {
+      position: absolute;
+      inset: 5px;
+      width: calc(100% - 10px);
+      height: calc(100% - 10px);
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 12%;
+      z-index: 2;
+    }
+
+    /* ── Brand label ── */
+    .brand {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #e53935;
+      margin-bottom: 10px;
+      opacity: 0.85;
+      animation: fadeUp 0.7s ease both 0.15s;
+    }
+
+    /* ── Name ── */
+    .name {
+      font-size: clamp(28px, 8.5vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      background: linear-gradient(118deg,
+        #ff8a65 0%, #ef5350 22%, #ffb74d 50%, #ef5350 75%, #ff7043 100%);
+      background-size: 260% 260%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 28px rgba(229,57,53,0.4));
+      animation: gradientFlow 5.5s ease infinite, fadeUp 0.7s ease both 0.2s;
+    }
+    @keyframes gradientFlow {
+      0%   { background-position: 0%   60%; }
+      50%  { background-position: 100% 40%; }
+      100% { background-position: 0%   60%; }
+    }
+
+    /* ── Glow line ── */
+    .name-line {
+      height: 2px; border-radius: 2px;
+      background: linear-gradient(90deg, transparent, #e53935 28%, #ffb300 65%, transparent);
+      margin: 14px auto 24px;
+      animation: linePulse 3.8s ease-in-out infinite, fadeUp 0.7s ease both 0.25s;
+    }
+    @keyframes linePulse {
+      0%,100% { width: 32%; opacity: 0.48; }
+      50%      { width: 70%; opacity: 1;    }
+    }
+
+    /* ── Spec ── */
+    .spec {
+      font-size: 14px;
+      line-height: 1.78;
+      color: rgba(255,255,255,0.48);
+      margin-bottom: 34px;
+      animation: fadeUp 0.7s ease both 0.3s;
+    }
+    .spec strong { color: rgba(255,255,255,0.82); font-weight: 600; }
+
+    /* ── Divider ── */
+    .divider {
+      width: 30px; height: 1px;
+      background: rgba(229,57,53,0.3);
+      margin: 0 auto 30px;
+      animation: fadeUp 0.7s ease both 0.35s;
+    }
+
+    /* ── Social links ── */
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.7s ease both 0.4s;
+    }
+    .soc-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 7px;
+    }
+    .soc-link {
+      display: flex; align-items: center; justify-content: center;
+      width: 56px; height: 56px;
+      border-radius: 17px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      position: relative; overflow: hidden;
+      transition:
+        transform    0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow   0.3s ease,
+        border-color 0.3s ease,
+        color        0.3s ease;
+    }
+    .soc-link::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 17px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .soc-link.tg::after  { background: linear-gradient(140deg, #005f8e, #29b6f6); }
+    .soc-link:hover {
+      transform: translateY(-6px) scale(1.12);
+      color: #fff; border-color: transparent;
+    }
+    .soc-link.tg:hover { box-shadow: 0 12px 32px rgba(41,182,246,0.42); }
+    .soc-link:hover::after { opacity: 1; }
+    .soc-link svg {
+      position: relative; z-index: 1;
+      width: 26px; height: 26px;
+      fill: currentColor;
+      transition: transform 0.3s ease;
+    }
+    .soc-link:hover svg { transform: scale(1.15); }
+    .soc-caption {
+      font-size: 9.5px; letter-spacing: 0.6px;
+      color: rgba(255,255,255,0.27);
+      font-weight: 500; text-transform: uppercase;
+    }
+
+    /* ── CTA Button ── */
+    .cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 17px 44px;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #c62828 0%, #e53935 50%, #f4511e 100%);
+      background-size: 200% 200%;
+      color: #fff;
+      font-size: 15.5px; font-weight: 700; letter-spacing: 0.15px;
+      text-decoration: none; border: none; cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: transform 0.32s ease, box-shadow 0.32s ease, filter 0.32s ease;
+      box-shadow: 0 4px 28px rgba(198,40,40,0.48), inset 0 1px 0 rgba(255,255,255,0.13);
+      animation: fadeUp 0.7s ease both 0.45s, ctaPulse 3.5s ease-in-out 1.2s infinite;
+    }
+    @keyframes ctaPulse {
+      0%,100% { box-shadow: 0 4px 28px rgba(198,40,40,0.48), inset 0 1px 0 rgba(255,255,255,0.13); }
+      50%      { box-shadow: 0 8px 42px rgba(229,57,53,0.65), inset 0 1px 0 rgba(255,255,255,0.13); }
+    }
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -90%;
+      width: 50%; height: 200%;
+      background: linear-gradient(to right,
+        rgba(255,255,255,0) 0%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 100%);
+      transform: skewX(-24deg);
+      animation: shimmer 3.5s ease-in-out 1s infinite;
+    }
+    @keyframes shimmer {
+      0%   { left: -90%; }
+      100% { left: 145%; }
+    }
+    .cta:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 44px rgba(229,57,53,0.65);
+      filter: brightness(1.1);
+    }
+    .cta:active { transform: translateY(-1px); }
+    .cta svg {
+      width: 18px; height: 18px; fill: currentColor; flex-shrink: 0;
+      animation: sendPop 3.5s ease-in-out 1.2s infinite;
+    }
+    @keyframes sendPop {
+      0%,44%,56%,100% { transform: translateX(0) rotate(0); }
+      48%             { transform: translateX(5px) rotate(-6deg); }
+      52%             { transform: translateX(-1px) rotate(2deg); }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      animation: fadeUp 0.7s ease both 0.5s;
+    }
+    .footer-text {
+      font-size: 10px; color: rgba(255,255,255,0.16);
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* ── Entrance animation ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 420px) {
+      .card      { padding: 40px 24px 36px; }
+      .photo-wrap{ width: 110px; height: 110px; }
+      .soc-link  { width: 50px; height: 50px; border-radius: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Aurora orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+
+<!-- Noise grain -->
+<div class="noise"></div>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="card">
+
+  <!-- Photo with rotating gradient ring -->
+  <div class="photo-wrap">
+    <div class="photo-glow"></div>
+    <div class="photo-ring"></div>
+    <div class="photo-gap"></div>
+    <img
+      src="qIGjsq-a0jI — копия.jpg"
+      class="photo-img"
+      alt="Николай Мальцев"
+      onerror="this.style.display='none';document.querySelector('.photo-fallback').style.display='flex';"
+    >
+    <!-- SVG fallback if photo missing -->
+    <div class="photo-fallback" style="display:none;position:absolute;inset:5px;border-radius:50%;
+         background:linear-gradient(145deg,#9b1111,#e53935,#f4511e);
+         align-items:center;justify-content:center;z-index:2;">
+      <svg viewBox="0 0 48 48" fill="none" style="width:40px;height:40px">
+        <path d="M24 10 a10 10 0 1 1 0 20 a10 10 0 0 1 0-20Z" fill="rgba(255,255,255,0.9)"/>
+        <path d="M8 44 C8 34 15 28 24 28 C33 28 40 34 40 44" stroke="rgba(255,255,255,0.9)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="brand">ФерМама</div>
+  <h1 class="name">Николай Мальцев</h1>
+  <div class="name-line"></div>
+
+  <p class="spec">
+    Предприниматель, основатель и директор<br>
+    мясного магазина <strong>«ФерМама»</strong><br>
+    и производственного цеха<br>
+    натуральных мясных полуфабрикатов
+  </p>
+
+  <div class="divider"></div>
+
+  <!-- Social links -->
+  <div class="socials">
+    <div class="soc-wrap">
+      <a href="https://t.me/fermama_business" target="_blank" rel="noopener"
+         class="soc-link tg" title="Telegram">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+      </a>
+      <span class="soc-caption">Telegram</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <a href="https://t.me/FerMama" target="_blank" rel="noopener" class="cta">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+    </svg>
+    Написать мне
+  </a>
+
+  <div class="footer">
+    <p class="footer-text">© 2026 &nbsp;·&nbsp; Натуральные мясные продукты</p>
+  </div>
+
+</div>
+
+<script>
+  // Floating particles
+  (function () {
+    var wrap = document.getElementById('particles');
+    for (var i = 0; i < 32; i++) {
+      var el = document.createElement('div');
+      el.className = 'particle';
+      var size = Math.random() * 3.5 + 1;
+      el.style.cssText = [
+        'left:'               + (Math.random() * 100) + '%',
+        'width:'              + size + 'px',
+        'height:'             + size + 'px',
+        'animation-duration:' + (Math.random() * 18 + 9) + 's',
+        'animation-delay:'    + (Math.random() * 22) + 's',
+        'opacity:'            + (Math.random() * 0.5 + 0.08)
+      ].join(';');
+      wrap.appendChild(el);
+    }
+  })();
+</script>
+
+</body>
+</html>
